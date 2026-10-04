@@ -15,6 +15,7 @@ dependencies = [
     "matplotlib>=3.9",
     "tenacity>=9.0",
     "typer>=0.12",
+    "tiktoken>=0.7",
 ]
 
 [project.optional-dependencies]

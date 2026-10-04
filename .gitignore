@@ -13,6 +13,7 @@ __pycache__/
 
 # data & cache (재현 가능, 커밋하지 않음)
 data/raw/
+data/processed/
 results/cache/
 results/*.json
 results/*.jsonl
