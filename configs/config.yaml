@@ -19,18 +19,25 @@ dataset:
 
 jev:
   provider: typesafe                # typesafe | openrouter | aimlapi
+  model: jev-1.13.0                 # jev-latest 대신 버전 고정 (재현성). docs.typesafe.ai/models, 확인일 2026-10-04
+  endpoint: https://api.typesafe.ai/v1/systemone
   prompt_version: v1
   question_variants: [v1, v2, v3]   # 문구 민감도 ablation
-  max_input_tokens: null            # Phase 2: 공식 문서로 확인 후 고정 (32K/64K 등)
+  max_input_tokens: 32000           # state + 가장 긴 질문 기준 32K (공식 문서 확인, 전체 요청 한도는 64K)
   overflow_policy: truncate         # truncate | exclude — 선택 시 처리 건수를 결과에 기록
 
 vertex:
   project: null                     # GCP_PROJECT_ID 환경변수로 주입
-  region: us-west1                  # Jev 서비스가 미국 서부로 알려져 지연시간 비교를 위해 우선 검토 (README에 근거 기록)
+  region: us-west1                  # Jev 서비스가 미국 서부로 알려져 지연시간 비교를 위해 우선 검토.
+                                     # cloud.google.com/vertex-ai/generative-ai/docs/learn/locations (확인일 2026-10-04)에서
+                                     # gemini-2.5-pro/flash 둘 다 us-west1(Oregon) 서빙 확인됨
   models:
-    primary: null                   # Gemini Pro 계열 모델 ID — Phase 1 공식 문서로 확정
-    cheap: null                     # Gemini Flash 계열 모델 ID — Phase 1 공식 문서로 확정
-  thinking_budget: 0                # A/폴백/C 전부 동일 고정값. 변경 시 이 한 곳만 수정
+    primary: gemini-2.5-pro         # 기준 A / 캐스케이드 B 폴백. 3.x Pro는 아직 Preview뿐이라 GA인 2.5 사용
+    cheap: gemini-2.5-flash         # 저가형 대조군 C. primary와 같은 세대로 맞춰 세대효과 혼입 방지
+  thinking_budget: 128              # A/폴백/C 전부 동일 고정값. Gemini 2.5 Pro는 thinking을 끌 수 없음
+                                     # (공식 문서 확인: 2.5 Pro min=128/max=32768, 2.5 Flash는 0 가능/max=24576).
+                                     # 그래서 "끄거나 같은 예산" 중 "같은 예산"을 택함 — 둘 다 유효한 Pro의 최솟값 128로 통일.
+                                     # 출처: cloud.google.com/vertex-ai/generative-ai/docs/thinking, 확인일 2026-10-04
   response_schema:
     type: object
     properties:
@@ -47,9 +54,8 @@ budget:
   stop_on_exceed: true
 
 cache:
-  backend: local                    # local | gcs
+  backend: local                    # local만 구현됨. gcs(Cloud Run Job용)는 설계만 해두고 아직 미구현
   local_dir: results/cache
-  gcs_bucket: null                  # backend: gcs일 때 사용
   key_fields: [provider, model, prompt_version, sample_id]
 
 concurrency:

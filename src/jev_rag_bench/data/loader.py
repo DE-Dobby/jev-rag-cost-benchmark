@@ -55,6 +55,11 @@ def load_merged_samples(
     return samples
 
 
+def load_processed_samples(path: Path) -> list[MergedSample]:
+    """prepare-data가 저장한 data/processed/ragtruth_merged.jsonl을 다시 불러온다."""
+    return [MergedSample.model_validate(d) for d in _read_jsonl(path)]
+
+
 def grounding_text(sample: MergedSample) -> str:
     """판정 모델에 넘길 "근거 문서" 텍스트. Summary는 원문 그대로, QA/Data2txt는
     source_info 딕셔너리를 JSON으로 직렬화 (지시문 prompt 전체가 아니라 근거 자료만)."""

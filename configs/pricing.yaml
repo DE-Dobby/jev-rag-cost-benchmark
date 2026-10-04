@@ -3,34 +3,39 @@
 # 비용 계산은 "정가 단가 × 실제 토큰 수"로 한다 (크레딧/디스카운트 적용 후 청구액 아님).
 
 vertex:
+  # 온디맨드(Standard) 티어, 입력 <= 200K 토큰 구간 단가.
+  # RAGTruth 근거문서 토큰 길이가 max 2220이라(Phase 1 통계) 전량 이 구간에 해당 — 확인됨.
+  # Priority/Flex-Batch 티어는 쓰지 않음.
   gemini_pro:
-    model_id: ""
-    input_usd_per_1k_tokens: null
-    output_usd_per_1k_tokens: null
-    thinking_usd_per_1k_tokens: null   # thinking이 별도 과금되면 채움, 아니면 null로 유지하고 이유를 README에 기록
-    source_url: ""
-    checked_at: ""
+    model_id: "gemini-2.5-pro"
+    input_usd_per_1m_tokens: 1.25
+    output_usd_per_1m_tokens: 10.00   # response + reasoning(thinking) 통합 단가. thinking 별도 과금 없음
+    thinking_usd_per_1m_tokens: null  # output 단가에 포함되어 별도 SKU 없음 (페이지에 "Text output (response and reasoning)"로 명시)
+    source_url: "https://cloud.google.com/vertex-ai/generative-ai/pricing"
+    checked_at: "2026-10-04"
   gemini_flash:
-    model_id: ""
-    input_usd_per_1k_tokens: null
-    output_usd_per_1k_tokens: null
-    thinking_usd_per_1k_tokens: null
-    source_url: ""
-    checked_at: ""
+    model_id: "gemini-2.5-flash"
+    input_usd_per_1m_tokens: 0.30
+    output_usd_per_1m_tokens: 2.50    # response + reasoning(thinking) 통합 단가
+    thinking_usd_per_1m_tokens: null
+    source_url: "https://cloud.google.com/vertex-ai/generative-ai/pricing"
+    checked_at: "2026-10-04"
 
 jev:
   typesafe:
-    input_usd_per_1k_tokens: null
-    output_usd_per_1k_tokens: null
-    source_url: ""
-    checked_at: ""
+    model_id: "jev-1.13.0"            # jev-latest alias 대신 버전 고정 (재현성)
+    input_usd_per_1m_tokens: 0.042
+    output_usd_per_1m_tokens: 0.0     # 출력 토큰은 무료
+    source_url: "https://docs.typesafe.ai/models"
+    checked_at: "2026-10-04"
+  # openrouter/aimlapi는 이번 실험에서 사용 안 함 (jev_provider: typesafe로 고정)
   openrouter:
-    input_usd_per_1k_tokens: null
-    output_usd_per_1k_tokens: null
+    input_usd_per_1m_tokens: null
+    output_usd_per_1m_tokens: null
     source_url: ""
     checked_at: ""
   aimlapi:
-    input_usd_per_1k_tokens: null
-    output_usd_per_1k_tokens: null
+    input_usd_per_1m_tokens: null
+    output_usd_per_1m_tokens: null
     source_url: ""
     checked_at: ""
