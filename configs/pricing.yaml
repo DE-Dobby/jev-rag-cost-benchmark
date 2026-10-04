@@ -1,0 +1,36 @@
+# 단가 테이블. 각 항목은 반드시 source_url + checked_at(YYYY-MM-DD)을 채운다.
+# 임의 추정치 금지 — Phase 1~2에서 공식 가격 페이지를 확인한 뒤에만 숫자를 넣는다.
+# 비용 계산은 "정가 단가 × 실제 토큰 수"로 한다 (크레딧/디스카운트 적용 후 청구액 아님).
+
+vertex:
+  gemini_pro:
+    model_id: ""
+    input_usd_per_1k_tokens: null
+    output_usd_per_1k_tokens: null
+    thinking_usd_per_1k_tokens: null   # thinking이 별도 과금되면 채움, 아니면 null로 유지하고 이유를 README에 기록
+    source_url: ""
+    checked_at: ""
+  gemini_flash:
+    model_id: ""
+    input_usd_per_1k_tokens: null
+    output_usd_per_1k_tokens: null
+    thinking_usd_per_1k_tokens: null
+    source_url: ""
+    checked_at: ""
+
+jev:
+  typesafe:
+    input_usd_per_1k_tokens: null
+    output_usd_per_1k_tokens: null
+    source_url: ""
+    checked_at: ""
+  openrouter:
+    input_usd_per_1k_tokens: null
+    output_usd_per_1k_tokens: null
+    source_url: ""
+    checked_at: ""
+  aimlapi:
+    input_usd_per_1k_tokens: null
+    output_usd_per_1k_tokens: null
+    source_url: ""
+    checked_at: ""

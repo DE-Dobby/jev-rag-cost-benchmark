@@ -1,0 +1,59 @@
+# 실험 설정. 숫자/모델ID 중 null인 값은 Phase 1~2에서 공식 문서 확인 후 채운다.
+# (기억이나 추측으로 채우지 않는다 — 프로젝트 규칙)
+
+seed: 42
+
+dataset:
+  source: ragtruth
+  raw_dir: data/raw/ragtruth        # cache.backend가 gcs면 gs:// 경로로 전환
+  tasks: [QA, Data2txt, Summary]
+  label_mapping:
+    # 응답 단위 라벨: 환각 span이 하나라도 있으면 1, 없으면 0.
+    # 아래 두 플래그는 RAGTruth 라벨 스키마 확인 후(Phase 1) README에도 명시한다.
+    implicit_true_as_hallucination: true
+    due_to_null_as_hallucination: false
+  split:
+    use_native_split: true          # RAGTruth에 train/test 구분이 있으면 그대로 사용
+    dev_size: 500
+    test_size: 500
+
+jev:
+  provider: typesafe                # typesafe | openrouter | aimlapi
+  prompt_version: v1
+  question_variants: [v1, v2, v3]   # 문구 민감도 ablation
+  max_input_tokens: null            # Phase 2: 공식 문서로 확인 후 고정 (32K/64K 등)
+  overflow_policy: truncate         # truncate | exclude — 선택 시 처리 건수를 결과에 기록
+
+vertex:
+  project: null                     # GCP_PROJECT_ID 환경변수로 주입
+  region: us-west1                  # Jev 서비스가 미국 서부로 알려져 지연시간 비교를 위해 우선 검토 (README에 근거 기록)
+  models:
+    primary: null                   # Gemini Pro 계열 모델 ID — Phase 1 공식 문서로 확정
+    cheap: null                     # Gemini Flash 계열 모델 ID — Phase 1 공식 문서로 확정
+  thinking_budget: 0                # A/폴백/C 전부 동일 고정값. 변경 시 이 한 곳만 수정
+  response_schema:
+    type: object
+    properties:
+      hallucinated:
+        type: boolean
+    required: [hallucinated]
+
+cascade:
+  thresholds: [0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 0.99]
+  fallback_model: vertex.primary    # 캐스케이드 B의 폴백 = 기준 A와 동일 모델
+
+budget:
+  max_usd: 5.0                      # CLI --max-usd 로 오버라이드 가능. 초과 시 즉시 중단
+  stop_on_exceed: true
+
+cache:
+  backend: local                    # local | gcs
+  local_dir: results/cache
+  gcs_bucket: null                  # backend: gcs일 때 사용
+  key_fields: [provider, model, prompt_version, sample_id]
+
+concurrency:
+  max_parallel: 4
+  retry:
+    max_attempts: 5
+    backoff_base_sec: 2             # 지수 백오프 (429 대응)

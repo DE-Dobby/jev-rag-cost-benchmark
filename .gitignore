@@ -1,0 +1,22 @@
+# secrets / env
+.env
+*.key.json
+service-account*.json
+
+# python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.pytest_cache/
+.coverage
+
+# data & cache (재현 가능, 커밋하지 않음)
+data/raw/
+results/cache/
+results/*.json
+results/*.jsonl
+!results/summary/
+
+# os
+.DS_Store
